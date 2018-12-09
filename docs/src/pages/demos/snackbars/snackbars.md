@@ -74,6 +74,7 @@ Use a different transition all together.
 
 For more advanced use cases you might be able to take advantage of:
 
+<<<<<<< HEAD
 ### notistack
 
 ![stars](https://img.shields.io/github/stars/iamhosseindhv/notistack.svg?style=social&label=Stars)
@@ -82,3 +83,6 @@ For more advanced use cases you might be able to take advantage of:
 In the following example, we demonstrate how to use [notistack](https://github.com/iamhosseindhv/notistack). notistack makes it easy to display snackbars (so you don't have to deal with open/close state of them). It also enables you to stack them on top of one another.
 
 {{"demo": "pages/demos/snackbars/IntegrationNotistack.js"}}
+=======
+- [notistack](https://github.com/iamhosseindhv/notistack) Highly customisable notification snackbars that can be stacked on top of each other.
+>>>>>>> dc458170afe15c79822275e27f34dd57f14a2480
