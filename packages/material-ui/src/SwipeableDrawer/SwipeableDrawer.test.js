@@ -2,20 +2,21 @@ import React from 'react';
 import { assert } from 'chai';
 import { spy, stub } from 'sinon';
 import ReactDOM from 'react-dom';
-import { createMount, unwrap } from '../test-utils';
+import { createMount, unwrap } from '@material-ui/core/test-utils';
 import Paper from '../Paper';
 import Drawer from '../Drawer';
 import SwipeableDrawer, { reset } from './SwipeableDrawer';
 import SwipeArea from './SwipeArea';
 import createMuiTheme from '../styles/createMuiTheme';
 
-function fireBodyMouseEvent(name, properties) {
+function fireBodyMouseEvent(name, properties = {}) {
   const event = document.createEvent('MouseEvents');
   event.initEvent(name, true, true);
   Object.keys(properties).forEach(key => {
     event[key] = properties[key];
   });
   document.body.dispatchEvent(event);
+  return event;
 }
 
 describe('<SwipeableDrawer />', () => {

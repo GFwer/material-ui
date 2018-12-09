@@ -3,6 +3,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import formControlState from '../FormControl/formControlState';
+import FormControlContext from '../FormControl/FormControlContext';
+import withFormControlContext from '../FormControl/withFormControlContext';
 import withStyles from '../styles/withStyles';
 import { setRef } from '../utils/reactHelpers';
 import Textarea from './Textarea';
@@ -134,80 +137,32 @@ export const styles = theme => {
   };
 };
 
-export function formControlState({ props, states, context }) {
-  return states.reduce((acc, state) => {
-    acc[state] = props[state];
-
-    if (context && context.muiFormControl) {
-      if (typeof props[state] === 'undefined') {
-        acc[state] = context.muiFormControl[state];
-      }
-    }
-
-    return acc;
-  }, {});
-}
-
 /**
  * `InputBase` contains as few styles as possible.
  * It aims to be a simple building block for creating an input.
  * It contains a load of style reset and some state logic.
  */
 class InputBase extends React.Component {
-  constructor(props, context) {
-    super(props, context);
+  static getDerivedStateFromProps(props, state) {
+    // The blur won't fire when the disabled state is set on a focused input.
+    // We need to book keep the focused state manually.
+    if (props.disabled && state.focused) {
+      return { focused: false };
+    }
+    return null;
+  }
+
+  constructor(props) {
+    super(props);
     this.isControlled = props.value != null;
     if (this.isControlled) {
       this.checkDirty(props);
     }
-
-    const componentWillReceiveProps = (nextProps, nextContext) => {
-      // The blur won't fire when the disabled state is set on a focused input.
-      // We need to book keep the focused state manually.
-      if (
-        !formControlState({ props: this.props, context: this.context, states: ['disabled'] })
-          .disabled &&
-        formControlState({ props: nextProps, context: nextContext, states: ['disabled'] }).disabled
-      ) {
-        this.setState({
-          focused: false,
-        });
-      }
-    };
-
-    const componentWillUpdate = (nextProps, nextState, nextContext) => {
-      // Book keep the focused state.
-      if (
-        !formControlState({ props: this.props, context: this.context, states: ['disabled'] })
-          .disabled &&
-        formControlState({ props: nextProps, context: nextContext, states: ['disabled'] }).disabled
-      ) {
-        const { muiFormControl } = this.context;
-        if (muiFormControl && muiFormControl.onBlur) {
-          muiFormControl.onBlur();
-        }
-      }
-    };
-
-    /* eslint-disable no-underscore-dangle */
-    this.componentWillReceiveProps = componentWillReceiveProps;
-    this.componentWillReceiveProps.__suppressDeprecationWarning = true;
-    this.componentWillUpdate = componentWillUpdate;
-    this.componentWillUpdate.__suppressDeprecationWarning = true;
-    /* eslint-enable no-underscore-dangle */
   }
 
   state = {
     focused: false,
   };
-
-  getChildContext() {
-    // We are consuming the parent muiFormControl context.
-    // We don't want a child to consume it a second time.
-    return {
-      muiFormControl: null,
-    };
-  }
 
   componentDidMount() {
     if (!this.isControlled) {
@@ -215,18 +170,24 @@ class InputBase extends React.Component {
     }
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps) {
+    // Book keep the focused state.
+    if (!prevProps.disabled && this.props.disabled) {
+      const { muiFormControl } = this.props;
+      if (muiFormControl && muiFormControl.onBlur) {
+        muiFormControl.onBlur();
+      }
+    }
     if (this.isControlled) {
       this.checkDirty(this.props);
     } // else performed in the onChange
   }
 
   handleFocus = event => {
+    const { muiFormControl } = this.props;
     // Fix a bug with IE 11 where the focus/blur events are triggered
     // while the input is disabled.
-    if (
-      formControlState({ props: this.props, context: this.context, states: ['disabled'] }).disabled
-    ) {
+    if (formControlState({ props: this.props, muiFormControl, states: ['disabled'] }).disabled) {
       event.stopPropagation();
       return;
     }
@@ -236,7 +197,6 @@ class InputBase extends React.Component {
       this.props.onFocus(event);
     }
 
-    const { muiFormControl } = this.context;
     if (muiFormControl && muiFormControl.onFocus) {
       muiFormControl.onFocus(event);
     }
@@ -248,7 +208,7 @@ class InputBase extends React.Component {
       this.props.onBlur(event);
     }
 
-    const { muiFormControl } = this.context;
+    const { muiFormControl } = this.props;
     if (muiFormControl && muiFormControl.onBlur) {
       muiFormControl.onBlur(event);
     }
@@ -290,7 +250,7 @@ class InputBase extends React.Component {
   };
 
   checkDirty(obj) {
-    const { muiFormControl } = this.context;
+    const { muiFormControl } = this.props;
 
     if (isFilled(obj)) {
       if (muiFormControl && muiFormControl.onFilled) {
@@ -326,6 +286,7 @@ class InputBase extends React.Component {
       inputProps: { className: inputPropsClassName, ...inputPropsProp } = {},
       inputRef,
       margin,
+      muiFormControl,
       multiline,
       name,
       onBlur,
@@ -347,12 +308,13 @@ class InputBase extends React.Component {
       ...other
     } = this.props;
 
-    const { muiFormControl } = this.context;
     const fcs = formControlState({
       props: this.props,
-      context: this.context,
+      muiFormControl,
       states: ['disabled', 'error', 'margin', 'required', 'filled'],
     });
+
+    const focused = muiFormControl ? muiFormControl.focused : this.state.focused;
 
     const className = classNames(
       classes.root,
@@ -360,7 +322,7 @@ class InputBase extends React.Component {
         [classes.disabled]: fcs.disabled,
         [classes.error]: fcs.error,
         [classes.fullWidth]: fullWidth,
-        [classes.focused]: this.state.focused,
+        [classes.focused]: focused,
         [classes.formControl]: muiFormControl,
         [classes.marginDense]: fcs.margin === 'dense',
         [classes.multiline]: multiline,
@@ -419,38 +381,40 @@ class InputBase extends React.Component {
     }
 
     return (
-      <div className={className} onClick={this.handleClick} {...other}>
-        {renderPrefix
-          ? renderPrefix({
-              ...fcs,
-              startAdornment,
-              focused: this.state.focused,
-            })
-          : null}
-        {startAdornment}
-        <InputComponent
-          aria-invalid={fcs.error}
-          autoComplete={autoComplete}
-          autoFocus={autoFocus}
-          className={inputClassName}
-          defaultValue={defaultValue}
-          disabled={fcs.disabled}
-          id={id}
-          name={name}
-          onBlur={this.handleBlur}
-          onChange={this.handleChange}
-          onFocus={this.handleFocus}
-          onKeyDown={onKeyDown}
-          onKeyUp={onKeyUp}
-          placeholder={placeholder}
-          readOnly={readOnly}
-          required={fcs.required}
-          rows={rows}
-          value={value}
-          {...inputProps}
-        />
-        {endAdornment}
-      </div>
+      <FormControlContext.Provider value={null}>
+        <div className={className} onClick={this.handleClick} {...other}>
+          {renderPrefix
+            ? renderPrefix({
+                ...fcs,
+                startAdornment,
+                focused,
+              })
+            : null}
+          {startAdornment}
+          <InputComponent
+            aria-invalid={fcs.error}
+            autoComplete={autoComplete}
+            autoFocus={autoFocus}
+            className={inputClassName}
+            defaultValue={defaultValue}
+            disabled={fcs.disabled}
+            id={id}
+            name={name}
+            onBlur={this.handleBlur}
+            onChange={this.handleChange}
+            onFocus={this.handleFocus}
+            onKeyDown={onKeyDown}
+            onKeyUp={onKeyUp}
+            placeholder={placeholder}
+            readOnly={readOnly}
+            required={fcs.required}
+            rows={rows}
+            value={value}
+            {...inputProps}
+          />
+          {endAdornment}
+        </div>
+      </FormControlContext.Provider>
     );
   }
 }
@@ -479,7 +443,15 @@ InputBase.propTypes = {
   /**
    * The default input value, useful when not controlling the component.
    */
-  defaultValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  defaultValue: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+    PropTypes.bool,
+    PropTypes.object,
+    PropTypes.arrayOf(
+      PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool, PropTypes.object]),
+    ),
+  ]),
   /**
    * If `true`, the input will be disabled.
    */
@@ -519,6 +491,10 @@ InputBase.propTypes = {
    * FormControl.
    */
   margin: PropTypes.oneOf(['dense', 'none']),
+  /**
+   * @ignore
+   */
+  muiFormControl: PropTypes.object,
   /**
    * If `true`, a textarea element will be rendered.
    */
@@ -598,7 +574,10 @@ InputBase.propTypes = {
     PropTypes.string,
     PropTypes.number,
     PropTypes.bool,
-    PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool])),
+    PropTypes.object,
+    PropTypes.arrayOf(
+      PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool, PropTypes.object]),
+    ),
   ]),
 };
 
@@ -609,12 +588,4 @@ InputBase.defaultProps = {
   type: 'text',
 };
 
-InputBase.contextTypes = {
-  muiFormControl: PropTypes.object,
-};
-
-InputBase.childContextTypes = {
-  muiFormControl: PropTypes.object,
-};
-
-export default withStyles(styles, { name: 'MuiInputBase' })(InputBase);
+export default withStyles(styles, { name: 'MuiInputBase' })(withFormControlContext(InputBase));

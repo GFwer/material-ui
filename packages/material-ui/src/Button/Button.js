@@ -82,9 +82,15 @@ export const styles = theme => ({
   },
   /* Styles applied to the root element if `variant="outlined"` and `color="primary"`. */
   outlinedPrimary: {
+    color: theme.palette.primary.main,
     border: `1px solid ${fade(theme.palette.primary.main, 0.5)}`,
     '&:hover': {
       border: `1px solid ${theme.palette.primary.main}`,
+      backgroundColor: fade(theme.palette.primary.main, theme.palette.action.hoverOpacity),
+      // Reset on touch devices, it doesn't add specificity
+      '@media (hover: none)': {
+        backgroundColor: 'transparent',
+      },
     },
     '&$disabled': {
       border: `1px solid ${theme.palette.action.disabled}`,
@@ -92,9 +98,15 @@ export const styles = theme => ({
   },
   /* Styles applied to the root element if `variant="outlined"` and `color="secondary"`. */
   outlinedSecondary: {
+    color: theme.palette.secondary.main,
     border: `1px solid ${fade(theme.palette.secondary.main, 0.5)}`,
     '&:hover': {
       border: `1px solid ${theme.palette.secondary.main}`,
+      backgroundColor: fade(theme.palette.secondary.main, theme.palette.action.hoverOpacity),
+      // Reset on touch devices, it doesn't add specificity
+      '@media (hover: none)': {
+        backgroundColor: 'transparent',
+      },
     },
     '&$disabled': {
       border: `1px solid ${theme.palette.action.disabled}`,
@@ -185,7 +197,7 @@ export const styles = theme => ({
   colorInherit: {
     color: 'inherit',
   },
-  /* Styles applied to the root element if `size="mini"` & `variant="[fab | extendedFab]"`. */
+  /* Styles applied to the root element if `mini={true}` & `variant="[fab | extendedFab]"`. */
   mini: {
     width: 40,
     height: 40,
@@ -228,7 +240,7 @@ function Button(props) {
 
   const fab = variant === 'fab' || variant === 'extendedFab';
   const contained = variant === 'contained' || variant === 'raised';
-  const text = variant === 'text' || variant === 'flat' || variant === 'outlined';
+  const text = variant === 'text' || variant === 'flat';
   const className = classNames(
     classes.root,
     {
@@ -337,9 +349,11 @@ Button.propTypes = {
    * The variant to use.
    * __WARNING__: `flat` and `raised` are deprecated.
    * Instead use `text` and `contained` respectively.
+   * `fab` and `extendedFab` are deprecated.
+   * Instead use `<Fab>` and `<Fab variant="extended">`
    */
   variant: chainPropTypes(
-    PropTypes.oneOf(['text', 'flat', 'outlined', 'contained', 'raised', 'fab', 'extendedFab']),
+    PropTypes.oneOf(['text', 'outlined', 'contained', 'fab', 'extendedFab', 'flat', 'raised']),
     props => {
       if (props.variant === 'flat') {
         return new Error(
@@ -351,6 +365,19 @@ Button.propTypes = {
         return new Error(
           'The `raised` variant will be removed in the next major release. ' +
             '`contained` is equivalent and should be used instead.',
+        );
+      }
+      if (props.variant === 'fab') {
+        return new Error(
+          'The `fab` variant will be removed in the next major release. ' +
+            'The `<Fab>` component is equivalent and should be used instead.',
+        );
+      }
+      if (props.variant === 'extendedFab') {
+        return new Error(
+          'The `fab` variant will be removed in the next major release. ' +
+            'The `<Fab>` component with `variant="extended"` is equivalent ' +
+            'and should be used instead.',
         );
       }
 

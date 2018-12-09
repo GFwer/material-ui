@@ -5,6 +5,7 @@ import { isFilled, isAdornedStart } from '../InputBase/utils';
 import withStyles from '../styles/withStyles';
 import { capitalize } from '../utils/helpers';
 import { isMuiElement } from '../utils/reactHelpers';
+import FormControlContext from './FormControlContext';
 
 export const styles = {
   /* Styles applied to the root element. */
@@ -18,7 +19,6 @@ export const styles = {
     margin: 0,
     border: 0,
     verticalAlign: 'top', // Fix alignment issue on Safari.
-    zIndex: 0, // Reset the stacking context for the label z-index.
   },
   /* Styles applied to the root element if `margin="normal"`. */
   marginNormal: {
@@ -49,6 +49,13 @@ export const styles = {
  * ⚠️ Only one input can be used within a FormControl.
  */
 class FormControl extends React.Component {
+  static getDerivedStateFromProps(props, state) {
+    if (props.disabled && state.focused) {
+      return { focused: false };
+    }
+    return null;
+  }
+
   constructor(props) {
     super();
 
@@ -78,28 +85,6 @@ class FormControl extends React.Component {
         }
       });
     }
-  }
-
-  getChildContext() {
-    const { disabled, error, required, margin, variant } = this.props;
-    const { adornedStart, filled, focused } = this.state;
-
-    return {
-      muiFormControl: {
-        adornedStart,
-        disabled,
-        error,
-        filled,
-        focused,
-        margin,
-        onBlur: this.handleBlur,
-        onEmpty: this.handleClean,
-        onFilled: this.handleDirty,
-        onFocus: this.handleFocus,
-        required,
-        variant,
-      },
-    };
   }
 
   handleFocus = () => {
@@ -135,19 +120,37 @@ class FormControl extends React.Component {
       variant,
       ...other
     } = this.props;
+    const { adornedStart, filled, focused } = this.state;
+
+    const childContext = {
+      adornedStart,
+      disabled,
+      error,
+      filled,
+      focused,
+      margin,
+      onBlur: this.handleBlur,
+      onEmpty: this.handleClean,
+      onFilled: this.handleDirty,
+      onFocus: this.handleFocus,
+      required,
+      variant,
+    };
 
     return (
-      <Component
-        className={classNames(
-          classes.root,
-          {
-            [classes[`margin${capitalize(margin)}`]]: margin !== 'none',
-            [classes.fullWidth]: fullWidth,
-          },
-          className,
-        )}
-        {...other}
-      />
+      <FormControlContext.Provider value={childContext}>
+        <Component
+          className={classNames(
+            classes.root,
+            {
+              [classes[`margin${capitalize(margin)}`]]: margin !== 'none',
+              [classes.fullWidth]: fullWidth,
+            },
+            className,
+          )}
+          {...other}
+        />
+      </FormControlContext.Provider>
     );
   }
 }
@@ -205,10 +208,6 @@ FormControl.defaultProps = {
   margin: 'none',
   required: false,
   variant: 'standard',
-};
-
-FormControl.childContextTypes = {
-  muiFormControl: PropTypes.object,
 };
 
 export default withStyles(styles, { name: 'MuiFormControl' })(FormControl);

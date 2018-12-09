@@ -1,11 +1,10 @@
 ---
 filename: /packages/material-ui/src/FormGroup/FormGroup.js
-title: FormGroup API
 ---
 
 <!--- This documentation is automatically generated, do not try to edit it. -->
 
-# FormGroup
+# FormGroup API
 
 <p class="description">The API documentation of the FormGroup React component. Learn more about the properties and the CSS customization points.</p>
 
@@ -21,13 +20,13 @@ For the `Radio`, you should be using the `RadioGroup` component instead of this 
 
 | Name | Type | Default | Description |
 |:-----|:-----|:--------|:------------|
-| <span class="prop-name">children</span> | <span class="prop-type">node |   | The content of the component. |
-| <span class="prop-name">classes</span> | <span class="prop-type">object |   | Override or extend the styles applied to the component. See [CSS API](#css-api) below for more details. |
-| <span class="prop-name">row</span> | <span class="prop-type">bool | <span class="prop-default">false</span> | Display group of elements in a compact row. |
+| <span class="prop-name">children</span> | <span class="prop-type">node</span> |   | The content of the component. |
+| <span class="prop-name">classes</span> | <span class="prop-type">object</span> |   | Override or extend the styles applied to the component. See [CSS API](#css-api) below for more details. |
+| <span class="prop-name">row</span> | <span class="prop-type">bool</span> | <span class="prop-default">false</span> | Display group of elements in a compact row. |
 
 Any other properties supplied will be spread to the root element (native element).
 
-## CSS API
+## CSS
 
 You can override all the class names injected by Material-UI thanks to the `classes` property.
 This property accepts the following keys:

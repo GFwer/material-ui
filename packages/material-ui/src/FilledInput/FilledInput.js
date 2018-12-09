@@ -9,12 +9,13 @@ import withStyles from '../styles/withStyles';
 export const styles = theme => {
   const light = theme.palette.type === 'light';
   const bottomLineColor = light ? 'rgba(0, 0, 0, 0.42)' : 'rgba(255, 255, 255, 0.7)';
+  const backgroundColor = light ? 'rgba(0, 0, 0, 0.09)' : 'rgba(255, 255, 255, 0.09)';
 
   return {
     /* Styles applied to the root element. */
     root: {
       position: 'relative',
-      backgroundColor: light ? 'rgba(0, 0, 0, 0.09)' : 'rgba(255, 255, 255, 0.09)',
+      backgroundColor,
       borderTopLeftRadius: theme.shape.borderRadius,
       borderTopRightRadius: theme.shape.borderRadius,
       transition: theme.transitions.create('background-color', {
@@ -23,6 +24,10 @@ export const styles = theme => {
       }),
       '&:hover': {
         backgroundColor: light ? 'rgba(0, 0, 0, 0.13)' : 'rgba(255, 255, 255, 0.13)',
+        // Reset on touch devices, it doesn't add specificity
+        '@media (hover: none)': {
+          backgroundColor,
+        },
       },
       '&$focused': {
         backgroundColor: light ? 'rgba(0, 0, 0, 0.09)' : 'rgba(255, 255, 255, 0.09)',
@@ -119,13 +124,15 @@ export const styles = theme => {
 };
 
 function FilledInput(props) {
-  const { classes, ...other } = props;
+  const { disableUnderline, classes, ...other } = props;
 
   return (
     <InputBase
       classes={{
         ...classes,
-        root: classNames(classes.root, classes.underline, {}),
+        root: classNames(classes.root, {
+          [classes.underline]: !disableUnderline,
+        }),
         underline: null,
       }}
       {...other}
@@ -157,11 +164,23 @@ FilledInput.propTypes = {
   /**
    * The default input value, useful when not controlling the component.
    */
-  defaultValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  defaultValue: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+    PropTypes.bool,
+    PropTypes.object,
+    PropTypes.arrayOf(
+      PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool, PropTypes.object]),
+    ),
+  ]),
   /**
    * If `true`, the input will be disabled.
    */
   disabled: PropTypes.bool,
+  /**
+   * If `true`, the input will not have an underline.
+   */
+  disableUnderline: PropTypes.bool,
   /**
    * End `InputAdornment` for this component.
    */
@@ -248,7 +267,10 @@ FilledInput.propTypes = {
     PropTypes.string,
     PropTypes.number,
     PropTypes.bool,
-    PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool])),
+    PropTypes.object,
+    PropTypes.arrayOf(
+      PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool, PropTypes.object]),
+    ),
   ]),
 };
 

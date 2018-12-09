@@ -1,11 +1,10 @@
 ---
 filename: /packages/material-ui/src/Card/Card.js
-title: Card API
 ---
 
 <!--- This documentation is automatically generated, do not try to edit it. -->
 
-# Card
+# Card API
 
 <p class="description">The API documentation of the Card React component. Learn more about the properties and the CSS customization points.</p>
 
@@ -19,12 +18,12 @@ import Card from '@material-ui/core/Card';
 
 | Name | Type | Default | Description |
 |:-----|:-----|:--------|:------------|
-| <span class="prop-name">classes</span> | <span class="prop-type">object |   | Override or extend the styles applied to the component. See [CSS API](#css-api) below for more details. |
-| <span class="prop-name">raised</span> | <span class="prop-type">bool | <span class="prop-default">false</span> | If `true`, the card will use raised styling. |
+| <span class="prop-name">classes</span> | <span class="prop-type">object</span> |   | Override or extend the styles applied to the component. See [CSS API](#css-api) below for more details. |
+| <span class="prop-name">raised</span> | <span class="prop-type">bool</span> | <span class="prop-default">false</span> | If `true`, the card will use raised styling. |
 
 Any other properties supplied will be spread to the root element ([Paper](/api/paper/)).
 
-## CSS API
+## CSS
 
 You can override all the class names injected by Material-UI thanks to the `classes` property.
 This property accepts the following keys:

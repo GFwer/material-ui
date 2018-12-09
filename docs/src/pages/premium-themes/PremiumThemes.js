@@ -25,25 +25,9 @@ const styles = {
 
 const themes = [
   {
-    name: 'Material Dashboard',
-    description: 'Material Dashboard React is a Free Material-UI Admin.',
-    src: '/static/images/themes/creative-tim-dashboard.jpg',
-    price: 'FREE',
-    category: 'Admin & Dashboard',
-    href: 'https://www.creative-tim.com/product/material-dashboard-react?partner=104080',
-  },
-  {
-    name: 'Material Kit',
-    description: 'A Badass Material-UI Kit based on Material Design.',
-    src: '/static/images/themes/creative-tim-kit.jpg',
-    price: 'FREE',
-    category: 'Components',
-    href: 'https://www.creative-tim.com/product/material-kit-react?partner=104080',
-  },
-  {
     name: 'Material Dashboard Pro',
     description: 'Material Dashboard Pro React is a Premium Material-UI Admin.',
-    src: '/static/images/themes/creative-tim-dashboard.jpg',
+    src: '/static/themes/creative-tim-dashboard.jpg',
     price: '$59',
     category: 'Admin & Dashboard',
     href: 'https://www.creative-tim.com/product/material-dashboard-pro-react?partner=104080',
@@ -51,10 +35,48 @@ const themes = [
   {
     name: 'Material Kit Pro',
     description: 'A Badass Material-UI Kit based on Material Design.',
-    src: '/static/images/themes/creative-tim-kit.jpg',
+    src: '/static/themes/creative-tim-kit.jpg',
     price: '$89',
     category: 'Components',
     href: 'https://www.creative-tim.com/product/material-kit-pro-react?partner=104080',
+  },
+  {
+    name: 'Material Dashboard',
+    description: 'Material Dashboard React is a Free Material-UI Admin.',
+    src: '/static/themes/creative-tim-dashboard.jpg',
+    price: 'FREE',
+    category: 'Admin & Dashboard',
+    href: 'https://www.creative-tim.com/product/material-dashboard-react?partner=104080',
+  },
+  {
+    name: 'Material Kit',
+    description: 'A Badass Material-UI Kit based on Material Design.',
+    src: '/static/themes/creative-tim-kit.jpg',
+    price: 'FREE',
+    category: 'Components',
+    href: 'https://www.creative-tim.com/product/material-kit-react?partner=104080',
+  },
+  {
+    name: 'Paperbase',
+    description:
+      'A page that mimics Firebase. ' +
+      'This item includes theming using the theme provider component.',
+    src: '/static/themes/paperbase.png',
+    price: 'FREE',
+    category: 'Admin & Dashboard',
+    href: '/premium-themes/paperbase',
+    source:
+      'https://github.com/mui-org/material-ui/tree/master/docs/src/pages/premium-themes/paperbase',
+  },
+  {
+    name: 'Onepirate',
+    description: 'An example landing and sign-up page.',
+    src: '/static/themes/onepirate.jpg',
+    price: 'FREE',
+    category: 'Landing page',
+    href: '/premium-themes/onepirate',
+    source:
+      'https://github.com/mui-org/material-ui/tree/master/docs/src/pages/premium-themes/onepirate',
   },
 ];
 
@@ -72,6 +94,9 @@ function PremiumThemes(props) {
               className={classes.media}
               image={theme.src}
               title={theme.name}
+              data-ga-event-category="premium-themes"
+              data-ga-event-action="click"
+              data-ga-event-label={theme.name}
             />
             <CardContent className={classes.cardContent}>
               <Grid container alignItems="center">
@@ -96,9 +121,17 @@ function PremiumThemes(props) {
                 href={theme.href}
                 size="small"
                 color="primary"
+                data-ga-event-category="premium-themes"
+                data-ga-event-action="click"
+                data-ga-event-label={theme.name}
               >
                 Learn More
               </Button>
+              {theme.source ? (
+                <Button component="a" href={theme.source} size="small" color="primary">
+                  Source code
+                </Button>
+              ) : null}
             </CardActions>
           </Card>
         </Grid>

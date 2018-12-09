@@ -16,6 +16,13 @@ module.exports = require('fs')
   .readFileSync(require.resolve('docs/src/pages/demos/menus/SimpleMenu'), 'utf8')
 `,
         },
+        'pages/demos/menus/MenuPopupState.js': {
+          js: require('docs/src/pages/demos/menus/MenuPopupState.js').default,
+          raw: preval`
+module.exports = require('fs')
+  .readFileSync(require.resolve('docs/src/pages/demos/menus/MenuPopupState'), 'utf8')
+`,
+        },
         'pages/demos/menus/SimpleListMenu.js': {
           js: require('docs/src/pages/demos/menus/SimpleListMenu').default,
           raw: preval`
@@ -56,6 +63,13 @@ module.exports = require('fs')
           raw: preval`
 module.exports = require('fs')
   .readFileSync(require.resolve('docs/src/pages/demos/menus/RenderPropsMenu'), 'utf8')
+`,
+        },
+        'pages/demos/menus/TypographyMenu.js': {
+          js: require('docs/src/pages/demos/menus/TypographyMenu').default,
+          raw: preval`
+module.exports = require('fs')
+  .readFileSync(require.resolve('docs/src/pages/demos/menus/TypographyMenu'), 'utf8')
 `,
         },
       }}

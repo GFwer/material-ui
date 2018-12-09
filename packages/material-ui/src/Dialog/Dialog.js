@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 // @inheritedComponent Modal
 
 import React from 'react';
@@ -8,6 +10,7 @@ import { capitalize } from '../utils/helpers';
 import Modal from '../Modal';
 import Fade from '../Fade';
 import { duration } from '../styles/transitions';
+import chainPropTypes from '../utils/chainPropTypes';
 import Paper from '../Paper';
 
 export const styles = theme => ({
@@ -24,6 +27,12 @@ export const styles = theme => ({
     overflowY: 'auto',
     overflowX: 'hidden',
   },
+  /* Styles applied to the container element. */
+  container: {
+    height: '100%',
+    // We disable the focus ring for mouse, touch and keyboard users.
+    outline: 'none',
+  },
   /* Styles applied to the `Paper` component. */
   paper: {
     display: 'flex',
@@ -31,8 +40,6 @@ export const styles = theme => ({
     margin: 48,
     position: 'relative',
     overflowY: 'auto', // Fix IE 11 issue, to remove at some point.
-    // We disable the focus ring for mouse, touch and keyboard users.
-    outline: 'none',
   },
   /* Styles applied to the `Paper` component if `scroll="paper"`. */
   paperScrollPaper: {
@@ -79,6 +86,15 @@ export const styles = theme => ({
       },
     },
   },
+  /* Styles applied to the `Paper` component if `maxWidth="xl"`. */
+  paperWidthXl: {
+    maxWidth: theme.breakpoints.values.xl,
+    '&$paperScrollBody': {
+      [theme.breakpoints.down(theme.breakpoints.values.xl + 48 * 2)]: {
+        margin: 48,
+      },
+    },
+  },
   /* Styles applied to the `Paper` component if `fullWidth={true}`. */
   paperFullWidth: {
     width: '100%',
@@ -100,77 +116,99 @@ export const styles = theme => ({
 /**
  * Dialogs are overlaid modal paper based components with a backdrop.
  */
-function Dialog(props) {
-  const {
-    BackdropProps,
-    children,
-    classes,
-    className,
-    disableBackdropClick,
-    disableEscapeKeyDown,
-    fullScreen,
-    fullWidth,
-    maxWidth,
-    onBackdropClick,
-    onClose,
-    onEnter,
-    onEntered,
-    onEntering,
-    onEscapeKeyDown,
-    onExit,
-    onExited,
-    onExiting,
-    open,
-    PaperProps,
-    scroll,
-    TransitionComponent,
-    transitionDuration,
-    TransitionProps,
-    ...other
-  } = props;
+class Dialog extends React.Component {
+  handleBackdropClick = event => {
+    if (event.target !== event.currentTarget) {
+      return;
+    }
 
-  return (
-    <Modal
-      className={classNames(classes.root, classes[`scroll${capitalize(scroll)}`], className)}
-      BackdropProps={{
-        transitionDuration,
-        ...BackdropProps,
-      }}
-      disableBackdropClick={disableBackdropClick}
-      disableEscapeKeyDown={disableEscapeKeyDown}
-      onBackdropClick={onBackdropClick}
-      onEscapeKeyDown={onEscapeKeyDown}
-      onClose={onClose}
-      open={open}
-      role="dialog"
-      {...other}
-    >
-      <TransitionComponent
-        appear
-        in={open}
-        timeout={transitionDuration}
-        onEnter={onEnter}
-        onEntering={onEntering}
-        onEntered={onEntered}
-        onExit={onExit}
-        onExiting={onExiting}
-        onExited={onExited}
-        {...TransitionProps}
+    if (this.props.onBackdropClick) {
+      this.props.onBackdropClick(event);
+    }
+
+    if (!this.props.disableBackdropClick && this.props.onClose) {
+      this.props.onClose(event, 'backdropClick');
+    }
+  };
+
+  render() {
+    const {
+      BackdropProps,
+      children,
+      classes,
+      className,
+      disableBackdropClick,
+      disableEscapeKeyDown,
+      fullScreen,
+      fullWidth,
+      maxWidth,
+      onBackdropClick,
+      onClose,
+      onEnter,
+      onEntered,
+      onEntering,
+      onEscapeKeyDown,
+      onExit,
+      onExited,
+      onExiting,
+      open,
+      PaperProps,
+      scroll,
+      TransitionComponent,
+      transitionDuration,
+      TransitionProps,
+      ...other
+    } = this.props;
+
+    return (
+      <Modal
+        className={classNames(classes.root, className)}
+        BackdropProps={{
+          transitionDuration,
+          ...BackdropProps,
+        }}
+        disableBackdropClick={disableBackdropClick}
+        disableEscapeKeyDown={disableEscapeKeyDown}
+        onBackdropClick={onBackdropClick}
+        onEscapeKeyDown={onEscapeKeyDown}
+        onClose={onClose}
+        open={open}
+        role="dialog"
+        {...other}
       >
-        <Paper
-          elevation={24}
-          className={classNames(classes.paper, classes[`paperScroll${capitalize(scroll)}`], {
-            [classes[`paperWidth${maxWidth ? capitalize(maxWidth) : ''}`]]: maxWidth,
-            [classes.paperFullScreen]: fullScreen,
-            [classes.paperFullWidth]: fullWidth,
-          })}
-          {...PaperProps}
+        <TransitionComponent
+          appear
+          in={open}
+          timeout={transitionDuration}
+          onEnter={onEnter}
+          onEntering={onEntering}
+          onEntered={onEntered}
+          onExit={onExit}
+          onExiting={onExiting}
+          onExited={onExited}
+          {...TransitionProps}
         >
-          {children}
-        </Paper>
-      </TransitionComponent>
-    </Modal>
-  );
+          <div
+            className={classNames(classes.container, classes[`scroll${capitalize(scroll)}`])}
+            onClick={this.handleBackdropClick}
+            role="document"
+          >
+            <Paper
+              elevation={24}
+              className={classNames(classes.paper, classes[`paperScroll${capitalize(scroll)}`], {
+                [classes[`paperWidth${maxWidth ? capitalize(maxWidth) : ''}`]]: maxWidth,
+                [classes.paperFullScreen]: fullScreen,
+                [classes.paperFullWidth]: fullWidth,
+              })}
+              {...PaperProps}
+            >
+              {children}
+            </Paper>
+          </div>
+        </TransitionComponent>
+      </Modal>
+    );
+  }
 }
 
 Dialog.propTypes = {
@@ -213,7 +251,7 @@ Dialog.propTypes = {
    * on the desktop where you might need some coherent different width size across your
    * application. Set to `false` to disable `maxWidth`.
    */
-  maxWidth: PropTypes.oneOf(['xs', 'sm', 'md', 'lg', false]),
+  maxWidth: PropTypes.oneOf(['xs', 'sm', 'md', 'lg', 'xl', false]),
   /**
    * Callback fired when the backdrop is clicked.
    */
@@ -259,8 +297,21 @@ Dialog.propTypes = {
   open: PropTypes.bool.isRequired,
   /**
    * Properties applied to the [`Paper`](/api/paper/) element.
+   * If you want to add a class to the `Paper` component use
+   * `classes.paper` in the `Dialog` props instead.
    */
-  PaperProps: PropTypes.object,
+  PaperProps: chainPropTypes(PropTypes.object, props => {
+    const { PaperProps = {} } = props;
+    if ('className' in PaperProps) {
+      return new Error(
+        '`className` overrides all `Dialog` specific styles in `Paper`. If you wanted to add ' +
+          'styles to the `Paper` component use `classes.paper` in the `Dialog` props ' +
+          `instead.${process.env.NODE_ENV === 'test' ? Date.now() : ''}`,
+      );
+    }
+
+    return null;
+  }),
   /**
    * Determine the container for scrolling the dialog.
    */

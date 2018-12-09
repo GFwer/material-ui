@@ -64,9 +64,13 @@ export const styles = theme => {
       },
       '&:hover:not($disabled):not($focused):not($error):before': {
         borderBottom: `2px solid ${theme.palette.text.primary}`,
+        // Reset on touch devices, it doesn't add specificity
+        '@media (hover: none)': {
+          borderBottom: `1px solid ${bottomLineColor}`,
+        },
       },
       '&$disabled:before': {
-        borderBottom: `1px dotted ${bottomLineColor}`,
+        borderBottomStyle: 'dotted',
       },
     },
     /* Styles applied to the root element if `error={true}`. */
@@ -129,7 +133,15 @@ Input.propTypes = {
   /**
    * The default input value, useful when not controlling the component.
    */
-  defaultValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  defaultValue: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+    PropTypes.bool,
+    PropTypes.object,
+    PropTypes.arrayOf(
+      PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool, PropTypes.object]),
+    ),
+  ]),
   /**
    * If `true`, the input will be disabled.
    */
@@ -224,7 +236,10 @@ Input.propTypes = {
     PropTypes.string,
     PropTypes.number,
     PropTypes.bool,
-    PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool])),
+    PropTypes.object,
+    PropTypes.arrayOf(
+      PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool, PropTypes.object]),
+    ),
   ]),
 };
 

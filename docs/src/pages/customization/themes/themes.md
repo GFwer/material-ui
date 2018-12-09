@@ -23,7 +23,7 @@ Changing the theme configuration variables is the most effective way to match Ma
 The following sections cover the most important theme variables:
 
 - [Palette](#palette)
-- [Type (light / dark theme)](#type-light-dark-theme-)
+- [Type (light / dark theme)](#type-light-dark-theme)
 - [Typography](#typography)
 - [Other variables](#other-variables)
 - [Custom variables](#custom-variables)
@@ -188,6 +188,7 @@ Need inspiration? The Material Design team has built an awesome [palette configu
 
 You can make the theme dark by setting `type` to `dark`.
 While it's only a single property value change, internally it modifies the value of the following keys:
+
 - `palette.text`
 - `palette.divider`
 - `palette.background`
@@ -355,10 +356,15 @@ Let's say you want to display the value of the primary color, you can use the `w
 
 ## Nesting the theme
 
-The theming solution is very flexible, as you can nest multiple theme providers.
+The theming solution is very flexible, as [you can nest](/css-in-js/advanced/#theme-nesting) multiple theme providers.
 This can be really useful when dealing with different area of your application that have distinct appearance from each other.
 
-{{"demo": "pages/customization/themes/Nested.js"}}
+{{"demo": "pages/customization/themes/ThemeNesting.js"}}
+
+The inner theme will **override** the outer theme.
+You can extend the outer theme by providing a function:
+
+{{"demo": "pages/customization/themes/ThemeNestingExtend.js"}}
 
 #### A note on performance
 

@@ -23,6 +23,11 @@ For instance, via Google Web Fonts:
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500">
 ```
 
+Alternatively, if you are using JSX over HTML to render the head:
+```jsx
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" />
+```
+
 ## Font Icons
 
 In order to use the font `Icon` component you must first add the [Material icons](https://material.io/tools/icons/) font.
@@ -33,10 +38,15 @@ For instance, via Google Web Fonts:
 <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 ```
 
+Alternatively, if you are using JSX over HTML to render the head:
+```jsx
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+```
+
 ## SVG Icons
 
 In order to use prebuilt SVG Material icons, such as those found in the [component demos](/demos/app-bar/)
-you must first install the [@material-ui/icons](https://www.npmjs.com/package@material-ui/icons) package:
+you must first install the [@material-ui/icons](https://www.npmjs.com/package/@material-ui/icons) package:
 
 ```sh
 npm install @material-ui/icons
@@ -52,6 +62,7 @@ affecting performance and bandwidth utilisation.
 #### UMD releases
 
 We are providing two Universal Module Definition (UMD) files:
+
 - one for development: https://unpkg.com/@material-ui/core/umd/material-ui.development.js
 - one for production: https://unpkg.com/@material-ui/core/umd/material-ui.production.min.js
 

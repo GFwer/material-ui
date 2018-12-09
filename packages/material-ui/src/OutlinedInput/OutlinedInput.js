@@ -8,12 +8,32 @@ import NotchedOutline from './NotchedOutline';
 import withStyles from '../styles/withStyles';
 
 export const styles = theme => {
+  const borderColor =
+    theme.palette.type === 'light' ? 'rgba(0, 0, 0, 0.23)' : 'rgba(255, 255, 255, 0.23)';
+
   return {
     /* Styles applied to the root element. */
     root: {
       position: 'relative',
+      '& $notchedOutline': {
+        borderColor,
+      },
       '&:hover:not($disabled):not($focused):not($error) $notchedOutline': {
         borderColor: theme.palette.text.primary,
+        // Reset on touch devices, it doesn't add specificity
+        '@media (hover: none)': {
+          borderColor,
+        },
+      },
+      '&$focused $notchedOutline': {
+        borderColor: theme.palette.primary.main,
+        borderWidth: 2,
+      },
+      '&$error $notchedOutline': {
+        borderColor: theme.palette.error.main,
+      },
+      '&$disabled $notchedOutline': {
+        borderColor: theme.palette.action.disabled,
       },
     },
     /* Styles applied to the root element if the component is focused. */
@@ -69,9 +89,6 @@ function OutlinedInput(props) {
       renderPrefix={state => (
         <NotchedOutline
           className={classes.notchedOutline}
-          disabled={state.disabled}
-          error={state.error}
-          focused={state.focused}
           labelWidth={labelWidth}
           notched={
             typeof notched !== 'undefined'
@@ -82,7 +99,7 @@ function OutlinedInput(props) {
       )}
       classes={{
         ...classes,
-        root: classNames(classes.root, classes.underline, {}),
+        root: classNames(classes.root, classes.underline),
         notchedOutline: null,
       }}
       {...other}
@@ -114,7 +131,15 @@ OutlinedInput.propTypes = {
   /**
    * The default input value, useful when not controlling the component.
    */
-  defaultValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  defaultValue: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+    PropTypes.bool,
+    PropTypes.object,
+    PropTypes.arrayOf(
+      PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool, PropTypes.object]),
+    ),
+  ]),
   /**
    * If `true`, the input will be disabled.
    */
@@ -213,7 +238,10 @@ OutlinedInput.propTypes = {
     PropTypes.string,
     PropTypes.number,
     PropTypes.bool,
-    PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool])),
+    PropTypes.object,
+    PropTypes.arrayOf(
+      PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool, PropTypes.object]),
+    ),
   ]),
 };
 
